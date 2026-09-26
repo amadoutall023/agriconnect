@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-green: #1F7A3D;
+  --color-green-deep: #175b2d;
+  --color-green-soft: #e5f1e5;
+  --color-accent-orange: #E8752C;
+  --color-orange-ink: #9d4716;
+  --color-trust-blue: #1B4F72;
+  --color-blue-soft: #e9f1f7;
+  --color-page: #f6f7f1;
+  --color-surface: #fffefa;
+  --color-ink: #182f1c;
+  --color-muted: #647365;
+  --color-line: #e1e7dd;
+  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
+  --shadow-card: 0 8px 22px rgb(31 57 33 / 8%);
+  --shadow-float: 0 18px 55px rgb(24 47 28 / 16%);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-width: 320px;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid rgb(27 79 114 / 48%);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: #d9ebd9;
+    color: var(--color-green-deep);
+  }
+}
+
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
