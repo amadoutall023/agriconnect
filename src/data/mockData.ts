@@ -1,10 +1,80 @@
-import type { Order, Product, Producer, SalesPoint } from '../types'
+import type { Driver, Order, Product, Producer, SalesPoint } from '../types'
 
 export const producers: Producer[] = [
-  { id: 'p-1', name: 'Mamadou Diallo', cooperative: 'Coopérative des Niayes', location: 'Rufisque', phone: '+221 77 512 08 34' },
-  { id: 'p-2', name: 'Fatou Sarr', cooperative: 'Jardins de Sangalkam', location: 'Sangalkam', phone: '+221 76 204 91 15' },
-  { id: 'p-3', name: 'Ibrahima Fall', cooperative: 'Union des céréaliers du Cayor', location: 'Thiès', phone: '+221 78 405 33 29' },
-  { id: 'p-4', name: 'Awa Diop', cooperative: 'Ferme des Almadies', location: 'Lac Rose', phone: '+221 70 800 43 18' },
+  {
+    id: 'p-1',
+    name: 'Mamadou Diallo',
+    cooperative: 'Coopérative des Niayes',
+    location: 'Rufisque',
+    phone: '+221 77 512 08 34',
+    waveOrOmNumber: '+221 77 512 08 34',
+    isPremium: true,
+    subscriptionTier: 'Premium Pro',
+    pinned: true,
+  },
+  {
+    id: 'p-2',
+    name: 'Fatou Sarr',
+    cooperative: 'Jardins de Sangalkam',
+    location: 'Sangalkam',
+    phone: '+221 76 204 91 15',
+    waveOrOmNumber: '+221 76 204 91 15',
+    isPremium: true,
+    subscriptionTier: 'Premium Standard',
+    pinned: true,
+  },
+  {
+    id: 'p-3',
+    name: 'Ibrahima Fall',
+    cooperative: 'Union des céréaliers du Cayor',
+    location: 'Thiès',
+    phone: '+221 78 405 33 29',
+    waveOrOmNumber: '+221 78 405 33 29',
+    isPremium: false,
+    subscriptionTier: 'Gratuit',
+    pinned: false,
+  },
+  {
+    id: 'p-4',
+    name: 'Awa Diop',
+    cooperative: 'Ferme des Almadies',
+    location: 'Lac Rose',
+    phone: '+221 70 800 43 18',
+    waveOrOmNumber: '+221 70 800 43 18',
+    isPremium: false,
+    subscriptionTier: 'Gratuit',
+    pinned: false,
+  },
+]
+
+export const initialDrivers: Driver[] = [
+  {
+    id: 'drv-1',
+    name: 'Modou Ndiaye',
+    phone: '+221 77 410 88 12',
+    vehicle: 'Moto Tricycle',
+    zone: 'Rufisque & Pikine',
+    status: 'Disponible',
+    activeOrderCount: 1,
+  },
+  {
+    id: 'drv-2',
+    name: 'Pape Sow',
+    phone: '+221 76 521 34 90',
+    vehicle: 'Camionnette Frigorifique',
+    zone: 'Dakar Centre & Almadies',
+    status: 'En livraison',
+    activeOrderCount: 2,
+  },
+  {
+    id: 'drv-3',
+    name: 'Cheikh Faye',
+    phone: '+221 78 109 22 45',
+    vehicle: 'Scooter Express',
+    zone: 'Sangalkam & Thiès',
+    status: 'Disponible',
+    activeOrderCount: 0,
+  },
 ]
 
 const harvestTrace = [
@@ -25,8 +95,44 @@ export const initialProducts: Product[] = [
 ]
 
 export const initialOrders: Order[] = [
-  { id: 'AC-2481', lines: [{ productId: 'mangue', quantityKg: 3 }, { productId: 'banane', quantityKg: 2 }], status: 'Confirmée', paymentMethod: 'Wave', deliveryMethod: 'Domicile', deliveryFee: 1200, createdAt: '19 sept.', customerName: 'Ndeye Fall', customerPhone: '+221 77 655 12 28' },
-  { id: 'AC-2476', lines: [{ productId: 'papaye', quantityKg: 5 }], status: 'En préparation', paymentMethod: 'Orange Money', deliveryMethod: 'Point relais', deliveryFee: 700, createdAt: '18 sept.', customerName: 'Alioune Cissé', customerPhone: '+221 76 340 57 20' },
+  {
+    id: 'AC-2481',
+    lines: [{ productId: 'mangue', quantityKg: 3 }, { productId: 'banane', quantityKg: 2 }],
+    status: 'En livraison',
+    paymentMethod: 'Wave',
+    paymentStatus: 'Payé',
+    paymentPhone: '+221 77 655 12 28',
+    paymentTransactionId: 'WAVE-AC-78921',
+    paymentTimestamp: '19 sept. 14:32',
+    deliveryMethod: 'Domicile',
+    deliveryFee: 1200,
+    createdAt: '19 sept.',
+    customerName: 'Ndeye Fall',
+    customerPhone: '+221 77 655 12 28',
+    driverId: 'drv-1',
+    driverName: 'Modou Ndiaye',
+    driverPhone: '+221 77 410 88 12',
+    payoutStatus: 'Non payé',
+  },
+  {
+    id: 'AC-2476',
+    lines: [{ productId: 'papaye', quantityKg: 5 }],
+    status: 'En préparation',
+    paymentMethod: 'Orange Money',
+    paymentStatus: 'Payé',
+    paymentPhone: '+221 76 340 57 20',
+    paymentTransactionId: 'OM-AC-44120',
+    paymentTimestamp: '18 sept. 09:15',
+    deliveryMethod: 'Point relais',
+    deliveryFee: 700,
+    createdAt: '18 sept.',
+    customerName: 'Alioune Cissé',
+    customerPhone: '+221 76 340 57 20',
+    driverId: 'drv-2',
+    driverName: 'Pape Sow',
+    driverPhone: '+221 76 521 34 90',
+    payoutStatus: 'Non payé',
+  },
 ]
 
 export const salesHistory: SalesPoint[] = [

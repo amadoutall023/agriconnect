@@ -23,9 +23,16 @@ export function ProductCard({ product, producer, onOpen, onAdd }: ProductCardPro
           loading="lazy"
           className="h-44 w-full object-cover transition duration-300 group-hover:scale-[1.03] sm:h-48"
         />
-        <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-trust-blue shadow-sm">
-          <QrCode size={14} aria-hidden="true" /> Traçable
-        </span>
+        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+          <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-trust-blue shadow-sm">
+            <QrCode size={14} aria-hidden="true" /> Traçable
+          </span>
+          {producer.isPremium && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-400 text-amber-950 px-2.5 py-1 text-xs font-extrabold shadow-md border border-amber-300">
+              ⭐ Producteur Premium
+            </span>
+          )}
+        </div>
         <span className="absolute bottom-3 left-3 rounded-full bg-ink/80 px-2.5 py-1 text-xs font-semibold text-white">
           {product.category}
         </span>
