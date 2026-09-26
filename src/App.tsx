@@ -75,6 +75,7 @@ const pushUrlPath = (targetPath: string) => {
 
 function App() {
   const initialRoute = useMemo(() => getRouteInfoFromPath(window.location.pathname), [])
+  const initialIsHome = initialRoute.role === 'consumer' && (initialRoute.consumerScreen ?? 'home') === 'home'
 
   const [role, setRole] = useState<UserRole>(initialRoute.role)
   const [consumerScreen, setConsumerScreenState] = useState<ConsumerScreen>(initialRoute.consumerScreen ?? 'home')
@@ -96,7 +97,7 @@ function App() {
   const [delivery, setDelivery] = useState<DeliveryMethod>('Domicile')
   const [chatOpen, setChatOpen] = useState(false)
   const [toast, setToast] = useState('')
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(!initialIsHome)
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev)
@@ -105,6 +106,7 @@ function App() {
   const handleNavigateConsumer = (screen: ConsumerScreen) => {
     setRole('consumer')
     setConsumerScreenState(screen)
+    setIsSidebarOpen(screen !== 'home')
     const map: Record<ConsumerScreen, string> = {
       home: '/',
       catalog: '/catalogue',
@@ -119,6 +121,7 @@ function App() {
   const handleNavigateProducer = (screen: ProducerScreen) => {
     setRole('producer')
     setProducerScreenState(screen)
+    setIsSidebarOpen(true)
     const map: Record<ProducerScreen, string> = {
       dashboard: '/producteur',
       products: '/producteur/produits',
@@ -131,6 +134,7 @@ function App() {
   const handleNavigateSuperAdmin = (tab: 'logistics' | 'inventory' | 'producers') => {
     setRole('superadmin')
     setSuperAdminTabState(tab)
+    setIsSidebarOpen(true)
     const map: Record<'logistics' | 'inventory' | 'producers', string> = {
       logistics: '/superadmin/expedition',
       inventory: '/superadmin/commissions',
@@ -152,6 +156,8 @@ function App() {
       if (route.consumerScreen) setConsumerScreenState(route.consumerScreen)
       if (route.producerScreen) setProducerScreenState(route.producerScreen)
       if (route.superAdminTab) setSuperAdminTabState(route.superAdminTab)
+      const isHome = route.role === 'consumer' && (route.consumerScreen ?? 'home') === 'home'
+      setIsSidebarOpen(!isHome)
     }
     window.addEventListener('popstate', syncRouteFromPath)
     return () => window.removeEventListener('popstate', syncRouteFromPath)
@@ -366,7 +372,7 @@ function App() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 min-w-0 transition-all">
+      <div className={`flex-1 min-w-0 transition-all duration-300 ${isSidebarOpen ? 'lg:pl-64' : 'lg:pl-0'}`}>
         <SiteHeader
           role={role}
           language={language}

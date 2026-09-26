@@ -52,9 +52,11 @@ export function Sidebar({
   const isOpen = propsIsOpen ?? internalIsOpen
 
   const closeSidebar = () => {
-    if (onClose) onClose()
-    else if (propsIsOpen && onToggleOpen) onToggleOpen()
-    else setInternalIsOpen(false)
+    if (window.innerWidth < 1024) {
+      if (onClose) onClose()
+      else if (propsIsOpen && onToggleOpen) onToggleOpen()
+      else setInternalIsOpen(false)
+    }
   }
 
   const handleConsumerClick = (screen: ConsumerScreen) => {
@@ -77,15 +79,19 @@ export function Sidebar({
 
   return (
     <>
-      {/* Overlay Backdrop */}
+      {/* Overlay Backdrop (Mobile only) */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"
-          onClick={closeSidebar}
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity lg:hidden"
+          onClick={() => {
+            if (onClose) onClose()
+            else if (propsIsOpen && onToggleOpen) onToggleOpen()
+            else setInternalIsOpen(false)
+          }}
         />
       )}
 
-      {/* Sidebar Container - Hidden by default (-translate-x-full) on all screens */}
+      {/* Sidebar Container */}
       <aside
         className={`fixed top-0 left-0 z-50 h-full w-64 bg-slate-900 text-white shadow-2xl transition-all duration-300 flex flex-col border-r border-slate-800/80 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
@@ -109,7 +115,11 @@ export function Sidebar({
 
           <button
             type="button"
-            onClick={closeSidebar}
+            onClick={() => {
+              if (onClose) onClose()
+              else if (propsIsOpen && onToggleOpen) onToggleOpen()
+              else setInternalIsOpen(false)
+            }}
             className="grid h-8 w-8 place-items-center rounded-xl bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition shrink-0"
             title="Fermer le menu"
           >
