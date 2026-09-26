@@ -281,7 +281,7 @@ export function SuperAdminDashboard({
               <button
                 type="button"
                 onClick={() => setIsAddingDriver(true)}
-                className="rounded-xl bg-sky-600 px-3.5 py-2 text-xs font-extrabold text-white hover:bg-sky-700 transition shadow flex items-center gap-1.5"
+                className="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-extrabold text-white hover:bg-slate-800 transition shadow flex items-center gap-1.5"
               >
                 <Plus size={16} />
                 <span>Ajouter un Livreur</span>
@@ -293,12 +293,12 @@ export function SuperAdminDashboard({
                     key={drv.id}
                     className="flex items-center gap-2 rounded-xl bg-white p-2 border border-slate-200 text-xs shadow-sm"
                   >
-                    <span className="grid h-7 w-7 place-items-center rounded-lg bg-sky-100 text-sky-700 font-extrabold shrink-0">
+                    <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-100 text-emerald-800 font-extrabold shrink-0">
                       <Truck size={14} />
                     </span>
                     <div>
                       <span className="font-bold block leading-tight text-slate-900">{drv.name}</span>
-                      <a href={`tel:${drv.phone}`} className="text-[10px] text-sky-700 font-mono font-extrabold hover:underline">
+                      <a href={`tel:${drv.phone}`} className="text-[10px] text-emerald-700 font-mono font-extrabold hover:underline">
                         {drv.phone}
                       </a>
                     </div>
@@ -317,6 +317,15 @@ export function SuperAdminDashboard({
                   const prod = products.find((p) => p.id === line.productId)
                   return sum + (prod?.pricePerKg ?? 0) * line.quantityKg
                 }, 0) + order.deliveryFee
+
+              const statusColorClass =
+                order.status === 'Confirmée'
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-900'
+                  : order.status === 'En préparation'
+                  ? 'border-amber-300 bg-amber-50 text-amber-900'
+                  : order.status === 'En livraison'
+                  ? 'border-purple-300 bg-purple-50 text-purple-900'
+                  : 'border-emerald-400 bg-emerald-100 text-emerald-950'
 
               return (
                 <article
@@ -338,7 +347,7 @@ export function SuperAdminDashboard({
                           e.stopPropagation()
                           onUpdateOrderStatus(order.id, e.target.value as OrderStatus)
                         }}
-                        className="rounded-xl border border-emerald-300 bg-emerald-50 py-1 px-2.5 text-xs font-extrabold text-emerald-900 focus:outline-none focus:ring-2 focus:ring-brand-green cursor-pointer shadow-sm"
+                        className={`rounded-xl border py-1.5 px-2.5 text-xs font-extrabold focus:outline-none focus:ring-2 focus:ring-brand-green cursor-pointer shadow-sm transition ${statusColorClass}`}
                       >
                         <option value="Confirmée">Confirmée</option>
                         <option value="En préparation">En préparation</option>
@@ -372,12 +381,12 @@ export function SuperAdminDashboard({
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-slate-500">Livreur :</span>
                         {assignedDriver ? (
-                          <span className="inline-flex items-center gap-1 font-extrabold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200">
-                            <Truck size={13} /> {assignedDriver.name}
+                          <span className="inline-flex items-center gap-1.5 font-extrabold text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                            <Truck size={13} className="text-emerald-700" /> {assignedDriver.name}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
-                            <AlertCircle size={13} /> Non affecté
+                          <span className="inline-flex items-center gap-1.5 font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+                            <AlertCircle size={13} className="text-amber-600" /> Non affecté
                           </span>
                         )}
                       </div>
@@ -395,7 +404,7 @@ export function SuperAdminDashboard({
                         e.stopPropagation()
                         setSelectedOrderDetails(order)
                       }}
-                      className="rounded-xl bg-slate-900 px-3 py-2 text-xs font-extrabold text-white hover:bg-slate-800 transition flex items-center gap-1.5 shadow-sm"
+                      className="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-extrabold text-white hover:bg-brand-green transition flex items-center gap-1.5 shadow-sm"
                     >
                       <UserCheck size={14} />
                       <span>Fiche / Appels</span>
@@ -660,15 +669,15 @@ export function SuperAdminDashboard({
             </div>
 
             {/* Driver section with ASSIGNMENT & DIRECT CALL BUTTON */}
-            <div className="rounded-2xl bg-sky-50 p-4 border border-sky-200 space-y-3">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-900 block">
+            <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200 space-y-3">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-800 block">
                 Affectation & Appel Livreur
               </span>
 
               {selectedOrderDetails.driverId ? (
-                <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-sky-200">
+                <div className="flex items-center justify-between bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
                   <div className="flex items-center gap-2.5">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-sky-100 text-sky-700 font-extrabold shrink-0">
+                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-100 text-emerald-800 font-extrabold shrink-0">
                       <Truck size={20} />
                     </span>
                     <div>
@@ -679,7 +688,7 @@ export function SuperAdminDashboard({
 
                   <a
                     href={`tel:${selectedOrderDetails.driverPhone}`}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-sky-700 px-3 py-2 text-xs font-extrabold text-white hover:bg-sky-800 transition shadow"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-extrabold text-white hover:bg-slate-800 transition shadow"
                   >
                     <PhoneCall size={14} />
                     <span>Appeler Livreur</span>
@@ -693,14 +702,14 @@ export function SuperAdminDashboard({
 
               {/* Assign selector */}
               <div>
-                <label className="block text-[11px] font-extrabold text-sky-950 uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
                   Choisir un livreur disponible :
                 </label>
                 <div className="space-y-2">
                   {drivers.map((drv) => (
                     <div
                       key={drv.id}
-                      className="flex items-center justify-between rounded-xl bg-white p-2.5 border border-sky-200 text-xs"
+                      className="flex items-center justify-between rounded-xl bg-white p-2.5 border border-slate-200 text-xs shadow-sm"
                     >
                       <div>
                         <span className="font-extrabold text-slate-900 block">{drv.name}</span>
@@ -709,7 +718,7 @@ export function SuperAdminDashboard({
                       <div className="flex items-center gap-2">
                         <a
                           href={`tel:${drv.phone}`}
-                          className="p-1.5 rounded-lg bg-sky-100 text-sky-800 hover:bg-sky-200"
+                          className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200"
                           title={`Appeler ${drv.name}`}
                         >
                           <Phone size={14} />
@@ -763,7 +772,7 @@ export function SuperAdminDashboard({
           <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-sky-100 text-sky-700 font-extrabold">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-100 text-emerald-800 font-extrabold">
                   <Truck size={18} />
                 </span>
                 <h3 className="text-lg font-extrabold text-slate-900">Ajouter un Nouveau Livreur</h3>
@@ -838,7 +847,7 @@ export function SuperAdminDashboard({
 
               <button
                 type="submit"
-                className="mt-4 w-full rounded-xl bg-sky-600 py-3 text-sm font-extrabold text-white shadow-md hover:bg-sky-700 transition"
+                className="mt-4 w-full rounded-xl bg-slate-900 py-3 text-sm font-extrabold text-white shadow-md hover:bg-slate-800 transition"
               >
                 Enregistrer le livreur
               </button>
