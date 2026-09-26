@@ -96,6 +96,11 @@ function App() {
   const [delivery, setDelivery] = useState<DeliveryMethod>('Domicile')
   const [chatOpen, setChatOpen] = useState(false)
   const [toast, setToast] = useState('')
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  const handleToggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev)
+  }
 
   const handleNavigateConsumer = (screen: ConsumerScreen) => {
     setRole('consumer')
@@ -343,7 +348,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-page text-ink flex">
-      {/* Sidebar Navigation */}
+      {/* Sidebar Navigation Drawer */}
       <Sidebar
         role={role}
         consumerScreen={consumerScreen}
@@ -351,6 +356,9 @@ function App() {
         superAdminTab={superAdminTab}
         cartCount={cartCount}
         orderCount={producerOrderCount}
+        isOpen={isSidebarOpen}
+        onToggleOpen={handleToggleSidebar}
+        onClose={() => setIsSidebarOpen(false)}
         onNavigateConsumer={handleNavigateConsumer}
         onNavigateProducer={handleNavigateProducer}
         onNavigateSuperAdmin={handleNavigateSuperAdmin}
@@ -358,12 +366,13 @@ function App() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 min-w-0 lg:pl-64 transition-all">
+      <div className="flex-1 min-w-0 transition-all">
         <SiteHeader
           role={role}
           language={language}
           cartCount={cartCount}
           search={query}
+          onToggleSidebar={handleToggleSidebar}
           onLanguageChange={(next) => { setLanguage(next); if (next !== 'Français') setToast(`${next} sera bientôt disponible`) }}
           onSearchChange={setQuery}
           onSearchSubmit={() => handleNavigateConsumer('catalog')}

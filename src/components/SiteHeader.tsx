@@ -1,4 +1,4 @@
-import { Globe2, Leaf, Search, ShieldCheck, ShoppingBasket, User } from 'lucide-react'
+import { Globe2, Leaf, Menu, Search, ShieldCheck, ShoppingBasket, User } from 'lucide-react'
 import type { Language, UserRole } from '../types'
 
 interface SiteHeaderProps {
@@ -6,6 +6,7 @@ interface SiteHeaderProps {
   language: Language
   cartCount: number
   search: string
+  onToggleSidebar: () => void
   onLanguageChange: (language: Language) => void
   onSearchChange: (value: string) => void
   onSearchSubmit: () => void
@@ -19,6 +20,7 @@ export function SiteHeader(props: SiteHeaderProps) {
     language,
     cartCount,
     search,
+    onToggleSidebar,
     onLanguageChange,
     onSearchChange,
     onSearchSubmit,
@@ -36,25 +38,38 @@ export function SiteHeader(props: SiteHeaderProps) {
     <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex min-h-[64px] items-center justify-between gap-3">
-          {/* Logo Brand */}
-          <button
-            type="button"
-            onClick={onGoHome}
-            className="flex items-center gap-2.5 text-left"
-            aria-label="AgriConnect — accueil"
-          >
-            <span className="grid h-9 w-9 place-items-center rounded-2xl bg-brand-green text-white shadow-sm sm:h-10 sm:w-10">
-              <Leaf size={19} fill="currentColor" aria-hidden="true" />
-            </span>
-            <span className="leading-tight">
-              <span className="block text-base font-extrabold tracking-tight text-brand-green sm:text-lg">
-                Agri<span className="text-ink">Connect</span>
+          <div className="flex items-center gap-3">
+            {/* Desktop & Mobile Hamburger Menu Toggle Button */}
+            <button
+              type="button"
+              onClick={onToggleSidebar}
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line bg-white text-ink hover:border-brand-green hover:text-brand-green transition shadow-sm"
+              title="Menu principal"
+              aria-label="Afficher ou masquer le menu latéral"
+            >
+              <Menu size={20} />
+            </button>
+
+            {/* Logo Brand */}
+            <button
+              type="button"
+              onClick={onGoHome}
+              className="flex items-center gap-2.5 text-left"
+              aria-label="AgriConnect — accueil"
+            >
+              <span className="grid h-9 w-9 place-items-center rounded-2xl bg-brand-green text-white shadow-sm sm:h-10 sm:w-10">
+                <Leaf size={19} fill="currentColor" aria-hidden="true" />
               </span>
-              <span className="hidden text-[10px] font-bold uppercase tracking-[.12em] text-muted sm:block">
-                Du champ au panier
+              <span className="leading-tight">
+                <span className="block text-base font-extrabold tracking-tight text-brand-green sm:text-lg">
+                  Agri<span className="text-ink">Connect</span>
+                </span>
+                <span className="hidden text-[10px] font-bold uppercase tracking-[.12em] text-muted sm:block">
+                  Du champ au panier
+                </span>
               </span>
-            </span>
-          </button>
+            </button>
+          </div>
 
           {/* Search Bar (visible on Consumer view) */}
           {role === 'consumer' && (

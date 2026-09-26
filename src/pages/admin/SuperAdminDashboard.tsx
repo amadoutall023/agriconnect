@@ -2,8 +2,6 @@ import { useState } from 'react'
 import {
   Truck,
   Wallet,
-  Users,
-  ShieldCheck,
   CheckCircle2,
   AlertCircle,
   Plus,
@@ -16,6 +14,8 @@ import {
   X,
   Phone,
   PhoneCall,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import type { Driver, Order, OrderStatus, Product, Producer, SubscriptionTier } from '../../types'
 import { formatFCFA } from '../../lib/format'
@@ -41,7 +41,6 @@ export function SuperAdminDashboard({
   producers,
   drivers,
   activeTab: externalActiveTab,
-  onTabChange,
   onAssignDriver,
   onUpdateOrderStatus,
   onPayoutProducer,
@@ -49,13 +48,8 @@ export function SuperAdminDashboard({
   onAddProducer,
   onAddDriver,
 }: SuperAdminDashboardProps) {
-  const [internalActiveTab, setInternalActiveTab] = useState<'logistics' | 'inventory' | 'producers'>('logistics')
+  const [internalActiveTab] = useState<'logistics' | 'inventory' | 'producers'>('logistics')
   const activeTab = externalActiveTab ?? internalActiveTab
-
-  const handleTabSelect = (tab: 'logistics' | 'inventory' | 'producers') => {
-    setInternalActiveTab(tab)
-    onTabChange?.(tab)
-  }
 
   // Modals state
   const [selectedOrderDetails, setSelectedOrderDetails] = useState<Order | null>(null)
@@ -73,6 +67,15 @@ export function SuperAdminDashboard({
   const [isAddingProducer, setIsAddingProducer] = useState(false)
   const [isAddingDriver, setIsAddingDriver] = useState(false)
 
+  // Driver pagination state
+  const [driverPage, setDriverPage] = useState(1)
+  const DRIVERS_PER_PAGE = 4
+  const totalDriverPages = Math.ceil(drivers.length / DRIVERS_PER_PAGE) || 1
+  const paginatedDrivers = drivers.slice(
+    (driverPage - 1) * DRIVERS_PER_PAGE,
+    driverPage * DRIVERS_PER_PAGE
+  )
+
   // New producer form state
   const [newProdName, setNewProdName] = useState('')
   const [newProdCoop, setNewProdCoop] = useState('')
@@ -85,17 +88,6 @@ export function SuperAdminDashboard({
   const [newDriverPhone, setNewDriverPhone] = useState('+221 77 000 00 00')
   const [newDriverVehicle, setNewDriverVehicle] = useState<Driver['vehicle']>('Moto Tricycle')
   const [newDriverZone, setNewDriverZone] = useState('Dakar & Banlieue')
-
-  // Calculate statistics
-  const totalRevenue = orders.reduce((sum, o) => {
-    const sub = o.lines.reduce((s, l) => {
-      const p = products.find((prod) => prod.id === l.productId)
-      return s + (p?.pricePerKg ?? 0) * l.quantityKg
-    }, 0)
-    return sum + sub
-  }, 0)
-
-  const platformCommission = totalRevenue * 0.1 // 10% commission
 
   // Group sales per producer for Payout inventory
   const producerSalesSummary = producers.map((prod) => {
@@ -192,120 +184,15 @@ export function SuperAdminDashboard({
   }
 
   return (
-    <main className="mx-auto min-h-[80vh] max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      {/* Header Banner */}
-      <div className="rounded-3xl bg-slate-900 text-white p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="absolute right-0 top-0 -mt-8 -mr-8 h-48 w-48 rounded-full bg-brand-green/20 blur-3xl pointer-events-none" />
-        <div className="flex flex-wrap items-center justify-between gap-4 relative z-10">
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-green/30 px-3 py-1 text-xs font-extrabold text-emerald-300 border border-brand-green/40">
-              <ShieldCheck size={14} /> Espace SuperAdmin · AgriConnect Logistics & Finance
-            </span>
-            <h1 className="mt-2 text-2xl sm:text-4xl font-extrabold tracking-tight">
-              Gestion Expédition, Commission & Producteurs
-            </h1>
-            <p className="mt-1 text-xs sm:text-sm text-slate-300">
-              Pilotez les livreurs, le statut des commandes via le sélecteur, et le transfert des ventes.
-            </p>
-          </div>
-
-          {/* Quick Metrics */}
-          <div className="flex flex-wrap gap-3">
-            <div className="rounded-2xl bg-white/10 backdrop-blur-md px-4 py-2.5 border border-white/10">
-              <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Total Ventes</span>
-              <span className="text-base font-extrabold text-white tabular-nums">{formatFCFA(totalRevenue)}</span>
-            </div>
-            <div className="rounded-2xl bg-emerald-500/20 backdrop-blur-md px-4 py-2.5 border border-emerald-500/30">
-              <span className="text-[10px] text-emerald-300 font-extrabold uppercase tracking-wider block">Commission Plateforme (10%)</span>
-              <span className="text-base font-extrabold text-emerald-400 tabular-nums">{formatFCFA(platformCommission)}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Tab Navigation */}
-        <div className="mt-8 flex flex-wrap gap-2 border-t border-slate-800 pt-4">
-          <button
-            type="button"
-            onClick={() => handleTabSelect('logistics')}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-extrabold transition ${
-              activeTab === 'logistics'
-                ? 'bg-brand-green text-white shadow-md'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-          >
-            <Truck size={17} />
-            <span>1. Expédition & Livreurs ({orders.length})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabSelect('inventory')}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-extrabold transition ${
-              activeTab === 'inventory'
-                ? 'bg-brand-green text-white shadow-md'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-          >
-            <Wallet size={17} />
-            <span>2. Inventaire & Commissions Producteurs</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabSelect('producers')}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-extrabold transition ${
-              activeTab === 'producers'
-                ? 'bg-brand-green text-white shadow-md'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-          >
-            <Users size={17} />
-            <span>3. Gestion Producteurs & Premium ({producers.length})</span>
-          </button>
-        </div>
-      </div>
-
+    <main className="mx-auto min-h-[80vh] max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       {/* TAB 1: EXPÉDITION & AFFECTATION LIVREUR */}
       {activeTab === 'logistics' && (
-        <section className="mt-8 space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-extrabold text-slate-900">Intermédiaire Expédition & Flotte de Livreurs</h2>
-              <p className="text-xs text-slate-500">
-                Changez le statut de chaque commande via le menu déroulant Select et affectez les livreurs.
-              </p>
-            </div>
-
-            {/* Drivers list with Add button */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setIsAddingDriver(true)}
-                className="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-extrabold text-white hover:bg-slate-800 transition shadow flex items-center gap-1.5"
-              >
-                <Plus size={16} />
-                <span>Ajouter un Livreur</span>
-              </button>
-
-              <div className="hidden lg:flex items-center gap-2">
-                {drivers.map((drv) => (
-                  <div
-                    key={drv.id}
-                    className="flex items-center gap-2 rounded-xl bg-white p-2 border border-slate-200 text-xs shadow-sm"
-                  >
-                    <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-100 text-emerald-800 font-extrabold shrink-0">
-                      <Truck size={14} />
-                    </span>
-                    <div>
-                      <span className="font-bold block leading-tight text-slate-900">{drv.name}</span>
-                      <a href={`tel:${drv.phone}`} className="text-[10px] text-emerald-700 font-mono font-extrabold hover:underline">
-                        {drv.phone}
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <section className="mt-6 space-y-8">
+          <div>
+            <h2 className="text-xl font-extrabold text-slate-900">1. Dispatching & Suivi des Commandes</h2>
+            <p className="text-xs text-slate-500">
+              Gérez l'état d'avancement de chaque commande via le sélecteur et visualisez le livreur affecté.
+            </p>
           </div>
 
           {/* Orders Grid */}
@@ -413,6 +300,185 @@ export function SuperAdminDashboard({
                 </article>
               )
             })}
+          </div>
+
+          {/* DEDICATED DRIVERS MANAGEMENT TABLE WITH PAGINATION */}
+          <div className="space-y-4 pt-8 border-t border-slate-200">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                  <span className="grid h-8 w-8 place-items-center rounded-xl bg-slate-900 text-emerald-400">
+                    <Truck size={17} />
+                  </span>
+                  Flotte des Livreurs Partenaires ({drivers.length})
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Gestion de la flotte avec numéros d'appel direct, véhicules et zones de couverture.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsAddingDriver(true)}
+                className="rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-slate-800 transition shadow-md flex items-center gap-2"
+              >
+                <Plus size={16} />
+                <span>Nouveau Livreur</span>
+              </button>
+            </div>
+
+            {/* Container for Desktop Table & Mobile Cards */}
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              {/* DESKTOP TABLE VIEW */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-700 uppercase font-extrabold tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th className="px-5 py-3.5">Livreur & Contact</th>
+                      <th className="px-4 py-3.5">Type de Véhicule</th>
+                      <th className="px-4 py-3.5">Zone Couverte</th>
+                      <th className="px-4 py-3.5">Statut Flotte</th>
+                      <th className="px-4 py-3.5 text-center">Commandes en cours</th>
+                      <th className="px-5 py-3.5 text-right">Appel Direct</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    {paginatedDrivers.map((drv) => {
+                      const activeOrders = orders.filter((o) => o.driverId === drv.id && o.status !== 'Livrée').length
+
+                      return (
+                        <tr key={drv.id} className="hover:bg-slate-50/80 transition">
+                          <td className="px-5 py-3.5">
+                            <div className="flex items-center gap-3">
+                              <span className="grid h-9 w-9 place-items-center rounded-xl bg-slate-100 text-slate-800 font-extrabold text-sm border border-slate-200">
+                                {drv.name.charAt(0)}
+                              </span>
+                              <div>
+                                <span className="font-extrabold text-sm text-slate-900 block">{drv.name}</span>
+                                <span className="font-mono text-[11px] text-slate-500">{drv.phone}</span>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="px-4 py-3.5 font-bold text-slate-700">
+                            {drv.vehicle}
+                          </td>
+
+                          <td className="px-4 py-3.5">
+                            <span className="inline-flex items-center gap-1 text-slate-700 font-bold bg-slate-100 px-2.5 py-1 rounded-lg">
+                              <MapPin size={12} className="text-emerald-700" /> {drv.zone}
+                            </span>
+                          </td>
+
+                          <td className="px-4 py-3.5">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" /> Disponible
+                            </span>
+                          </td>
+
+                          <td className="px-4 py-3.5 text-center font-extrabold text-slate-900 text-sm">
+                            {activeOrders}
+                          </td>
+
+                          <td className="px-5 py-3.5 text-right">
+                            <a
+                              href={`tel:${drv.phone}`}
+                              className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-1.5 text-xs font-extrabold text-white hover:bg-emerald-700 transition shadow-sm"
+                            >
+                              <PhoneCall size={13} />
+                              <span>Appeler</span>
+                            </a>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* MOBILE CARDS VIEW */}
+              <div className="block md:hidden divide-y divide-slate-100 p-3 space-y-3">
+                {paginatedDrivers.map((drv) => {
+                  const activeOrders = orders.filter((o) => o.driverId === drv.id && o.status !== 'Livrée').length
+
+                  return (
+                    <article key={drv.id} className="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <span className="grid h-10 w-10 place-items-center rounded-xl bg-slate-900 text-white font-extrabold text-sm">
+                            {drv.name.charAt(0)}
+                          </span>
+                          <div>
+                            <span className="font-extrabold text-sm text-slate-900 block">{drv.name}</span>
+                            <span className="font-mono text-xs text-slate-500">{drv.phone}</span>
+                          </div>
+                        </div>
+
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" /> Disponible
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-2 border-t border-slate-200/80">
+                        <span className="font-bold text-slate-700">{drv.vehicle}</span>
+                        <span className="inline-flex items-center gap-1 text-slate-700 font-bold bg-white px-2 py-0.5 rounded-md border border-slate-200 text-[11px]">
+                          <MapPin size={11} className="text-emerald-700" /> {drv.zone}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 pt-1">
+                        <span className="text-xs text-slate-500">
+                          Commandes en cours : <strong className="text-slate-900">{activeOrders}</strong>
+                        </span>
+
+                        <a
+                          href={`tel:${drv.phone}`}
+                          className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-extrabold text-white hover:bg-emerald-700 transition shadow"
+                        >
+                          <PhoneCall size={14} />
+                          <span>Appeler Direct</span>
+                        </a>
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
+
+              {/* RESPONSIVE PAGINATION FOOTER */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3 sm:px-5">
+                <span className="text-xs text-slate-500 font-medium text-center sm:text-left">
+                  Affichage de <strong className="text-slate-900">{Math.min(drivers.length, (driverPage - 1) * DRIVERS_PER_PAGE + 1)}</strong> à{' '}
+                  <strong className="text-slate-900">{Math.min(drivers.length, driverPage * DRIVERS_PER_PAGE)}</strong> sur{' '}
+                  <strong className="text-slate-900">{drivers.length}</strong> livreurs
+                </span>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={driverPage <= 1}
+                    onClick={() => setDriverPage((p) => Math.max(1, p - 1))}
+                    className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition"
+                  >
+                    <ChevronLeft size={14} />
+                    <span>Précédent</span>
+                  </button>
+
+                  <span className="text-xs font-extrabold text-slate-800 px-2">
+                    {driverPage} / {totalDriverPages}
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={driverPage >= totalDriverPages}
+                    onClick={() => setDriverPage((p) => Math.min(totalDriverPages, p + 1))}
+                    className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-extrabold text-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition"
+                  >
+                    <span>Suivant</span>
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       )}
